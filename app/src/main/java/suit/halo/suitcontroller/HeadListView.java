@@ -178,7 +178,6 @@ public class HeadListView extends ListView implements SensorEventListener
 
         if(lastPosition != position)
         {
-            //			Log.d(TAG, "Selecting pos. "+ position);
             if(canScroll)
             {
                 smoothScrollToPosition(position);
@@ -186,6 +185,12 @@ public class HeadListView extends ListView implements SensorEventListener
             setSelection(position);
             lastPosition = position;
         }
+
     }
 
+    @Override
+    public void setSelectionFromTop(int position, int y)
+    {
+        super.setSelectionFromTop(position, y);
+    }
 }

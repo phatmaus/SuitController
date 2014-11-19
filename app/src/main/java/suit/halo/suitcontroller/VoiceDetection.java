@@ -7,6 +7,7 @@ import com.google.glass.voice.VoiceConfig;
 import com.google.glass.voice.VoiceInputHelper;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 public class VoiceDetection extends StubVoiceListener
 {
@@ -15,20 +16,19 @@ public class VoiceDetection extends StubVoiceListener
 
     private final VoiceConfig mVoiceConfig;
     private String[] keyWordPhrases;
-    private String[] commandPhrases;
     private VoiceInputHelper mVoiceInputHelper;
     private VoiceDetectionListener mListener;
     private boolean mRunning = true;
-    private boolean isInCommandMode;
+    Constants.VOICE_MENU_MODE mode;
+    String firstWord;
 
-    public VoiceDetection(Context context, String keyWord, VoiceDetectionListener listener, String[] commands, String[] junkWords)
+    public VoiceDetection(Context context, String keyWord, VoiceDetectionListener listener, String[] junkWords)
     {
         mVoiceInputHelper = new VoiceInputHelper(context, this);
 
         keyWordPhrases = assemblePhrases(new String[]{keyWord}, new String[0], junkWords);
-        commandPhrases = assemblePhrases(new String[0], commands, new String[0]);
 
-        mVoiceConfig = new VoiceConfig(keyWordPhrases);
+        mVoiceConfig = new VoiceConfig();
         mVoiceConfig.setShouldSaveAudio(false);
 
         mListener = listener;
@@ -52,11 +52,46 @@ public class VoiceDetection extends StubVoiceListener
         return combinedPhraseList.toArray(new String[combinedPhraseList.size()]);
     }
 
-    public void changePhrases(boolean isInCommandMode)
+    public void changePhrases(Constants.VOICE_MENU_MODE mode, String... category)
     {
-        this.isInCommandMode = isInCommandMode;
-        mVoiceConfig.setCustomPhrases(isInCommandMode ? commandPhrases : keyWordPhrases);
-        mVoiceInputHelper.setVoiceConfig(mVoiceConfig);
+        if(category.length > 0)
+        {
+            firstWord = category[0];
+        }
+
+        switch (mode)
+        {
+            case KEYWORD:
+            {
+                mVoiceConfig.setCustomPhrases(keyWordPhrases);
+                mVoiceInputHelper.setVoiceConfig(mVoiceConfig);
+                this.mode = Constants.VOICE_MENU_MODE.KEYWORD;
+            }
+            break;
+            case FIRST_LEVEL:
+            {
+                {
+                    Map<String, String[]> commandPhrases = Constants.getCommandPhrases();
+                    String[] firstPhrases = new String[commandPhrases.keySet().size()];
+                    Constants.getCommandPhrases().keySet().toArray(firstPhrases);
+                    mVoiceConfig.setCustomPhrases(firstPhrases);
+                    mVoiceInputHelper.setVoiceConfig(mVoiceConfig);
+                    this.mode = Constants.VOICE_MENU_MODE.FIRST_LEVEL;
+                }
+                break;
+            }
+            case SECOND_LEVEL:
+            {
+                {
+                    Map<String, String[]> commandPhrases = Constants.getCommandPhrases();
+                    String[] secondPhrases = commandPhrases.get(firstWord);
+                    mVoiceConfig.setCustomPhrases(secondPhrases);
+                    mVoiceInputHelper.setVoiceConfig(mVoiceConfig);
+                    this.mode = Constants.VOICE_MENU_MODE.SECOND_LEVEL;
+                }
+                break;
+            }
+        }
     }
 
     @Override
@@ -64,22 +99,52 @@ public class VoiceDetection extends StubVoiceListener
     {
         String literal = vc.getLiteral();
 
-        if(isInCommandMode)
+        switch (mode)
         {
-            for (int i = 1; i < commandPhrases.length; ++i)
+            case KEYWORD:
             {
-                String item = commandPhrases[i];
-                if(item.equalsIgnoreCase(literal))
+                if(literal.equals(Constants.OK_GLASS))
                 {
-                    mListener.onPhraseDetected(i , literal);
+                    mListener.onHotwordDetected();
                     return null;
                 }
             }
-        }
-        else if (keyWordPhrases[0].equalsIgnoreCase(literal))
-        {
-           mListener.onHotwordDetected();
-            return null;
+            break;
+            case FIRST_LEVEL:
+            {
+                Map<String, String[]> commandPhrases = Constants.getCommandPhrases();
+                String[] firstPhrases = new String[commandPhrases.keySet().size()];
+                Constants.getCommandPhrases().keySet().toArray(firstPhrases);
+
+                for (int i = 0; i < firstPhrases.length; ++i)
+                {
+                    String item = firstPhrases[i];
+                    if(item.equalsIgnoreCase(literal))
+                    {
+                        mListener.onFirstWordDetected(i, literal);
+                        return null;
+                    }
+                }
+            }
+            break;
+            case SECOND_LEVEL:
+            {
+                {
+                    Map<String, String[]> commandPhrases = Constants.getCommandPhrases();
+                    String[] secondPhrases = commandPhrases.get(firstWord);
+
+                    for (int i = 0; i < secondPhrases.length; ++i)
+                    {
+                        String item = secondPhrases[i];
+                        if(item.equalsIgnoreCase(literal))
+                        {
+                            mListener.onSecondWordDetected(i, literal);
+                            return null;
+                        }
+                    }
+                }
+                break;
+            }
         }
         return null;
     }
@@ -106,7 +171,9 @@ public class VoiceDetection extends StubVoiceListener
     {
         public void onHotwordDetected();
 
-        public void onPhraseDetected(int index, String phrase);
+        public void onFirstWordDetected(int index, String phrase);
+
+        public void onSecondWordDetected(int index, String phrase);
     }
 }
 
