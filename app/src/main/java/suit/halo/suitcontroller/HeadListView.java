@@ -150,12 +150,9 @@ public class HeadListView extends ListView implements SensorEventListener
         }
 
         SensorManager.getRotationMatrixFromVector(mat, event.values);
-        SensorManager.remapCoordinateSystem(mat, SensorManager.AXIS_X, SensorManager.AXIS_Z, mat);
         SensorManager.getOrientation(mat, orientation);
 
-        float z = orientation[0], // see https://developers.google.com/glass/develop/gdk/location-sensors/index
-                x = orientation[1],
-                y = orientation[2];
+        float x = orientation[2];
 
         if(mStartX == INVALID_X)
         {
