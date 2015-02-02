@@ -25,7 +25,7 @@ public class IconList extends ArrayAdapter<String>
         LayoutInflater inflater = context.getLayoutInflater();
         View rowView = inflater.inflate(R.layout.list_single, null, true);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.navigation_icon);
-        imageView.setImageResource(Constants.getIconResource(""+listOfChoices[position]));
+        imageView.setImageResource(Constants.getIconResource(listOfChoices[position]));
         return rowView;
     }
 }

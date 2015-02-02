@@ -19,7 +19,7 @@ public class Constants
     public static final String LIGHTS_LOW = "Lights Low";
     public static final String LIGHTS_OFF = "Lights Off";
 
-    public static final String DEVICE_IDENTIFIER = "edmitrie";
+    public static final String DEVICE_IDENTIFIER = "beagle";
     public static final int DEVICE_CHANNEL = 2;
     public static final int blueToothChannel = 1;
 

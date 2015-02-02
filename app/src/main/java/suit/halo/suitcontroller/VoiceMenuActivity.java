@@ -53,7 +53,6 @@ public class VoiceMenuActivity extends Activity implements VoiceDetection.VoiceD
         String[] words = Constants.getFirstWords();
         IconList adapter = new IconList(this, words);
         mScroll.setAdapter(adapter);
-        //mScroll.setAdapter(new ArrayAdapter<>(this, R.layout.voice_menu_item, Constants.getFirstWords()));
 
         tv0 = (TextView) findViewById(R.id.temp0);
         tv1 = (TextView) findViewById(R.id.temp1);
@@ -66,7 +65,7 @@ public class VoiceMenuActivity extends Activity implements VoiceDetection.VoiceD
         mPairedDevices = mAdapter.getBondedDevices();
 
         mPairedDevices = mAdapter.getBondedDevices();
-/*        for (BluetoothDevice mDevice : mPairedDevices)
+        for (BluetoothDevice mDevice : mPairedDevices)
         {//will block until suitable bluetooth device found
             if(mDevice.getName().contains(Constants.DEVICE_IDENTIFIER))
             {
@@ -75,7 +74,7 @@ public class VoiceMenuActivity extends Activity implements VoiceDetection.VoiceD
             }
         }
 
-        new connectToHost().start();*/
+        new connectToHost().start();
     }
 
     private class connectToHost extends Thread
@@ -182,10 +181,7 @@ public class VoiceMenuActivity extends Activity implements VoiceDetection.VoiceD
                         firstWord = selectedItem;
                         IconList adapter = new IconList(VoiceMenuActivity.this, Constants.getSecondWords(selectedItem));
                         mScroll.setAdapter(adapter);
-                        //mScroll.setAdapter(new ArrayAdapter<String>(VoiceMenuActivity.this, R.layout.voice_menu_item,
-                           // Constants.getSecondWords(selectedItem)));
                         mVoiceDetection.changePhrases(Constants.VOICE_MENU_MODE.SECOND_LEVEL, selectedItem);
-                        //processCommand(selectedItem);
                     }
                     else
                     {//second level
@@ -193,8 +189,6 @@ public class VoiceMenuActivity extends Activity implements VoiceDetection.VoiceD
                         processCommand(firstWord + " " + selectedItem);
                         IconList adapter = new IconList(VoiceMenuActivity.this, Constants.getFirstWords());
                         mScroll.setAdapter(adapter);
-/*                        mScroll.setAdapter(new ArrayAdapter<>(VoiceMenuActivity.this, R.layout.voice_menu_item, Constants.getFirstWords()));*/
-
                         mVoiceDetection.changePhrases(Constants.VOICE_MENU_MODE.KEYWORD, selectedItem);
                     }
                 }
