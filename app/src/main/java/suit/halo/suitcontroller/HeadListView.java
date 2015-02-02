@@ -21,7 +21,7 @@ public class HeadListView extends ListView implements SensorEventListener
     private SensorManager mSensorManager;
     private float mStartX = INVALID_X;
     private static final int SENSOR_RATE_uS = 400000;
-    private static final float VELOCITY = (float) (Math.PI / 180 * 2); // scroll one item per 2°
+    private static final float VELOCITY = (float) (Math.PI / 180 * 9); // scroll one item per 2°
     /**
      * our content is larger than our view, and thus there is something to scroll
      */
